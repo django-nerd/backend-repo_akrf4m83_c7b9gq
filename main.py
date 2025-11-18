@@ -11,7 +11,7 @@ import requests
 
 from database import db, create_document, get_documents
 
-app = FastAPI(title="VoidSpark.world API", version="0.1.1")
+app = FastAPI(title="VoidSpark.world API", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,6 +52,11 @@ class MintItemRequest(BaseModel):
     wallet: str
     name: str
     attributes: dict = Field(default_factory=dict)
+
+class QuestClaimRequest(BaseModel):
+    wallet: str
+    quest_code: str
+    enemies_defeated: int
 
 
 # -----------------------------
@@ -263,6 +268,33 @@ def mint_item_nft(req: MintItemRequest):
     }
     create_document("nft_mint_intents", record)
     return {"ok": True, "note": "Recorded mint intent. Use deployment scripts to mint on-chain."}
+
+
+# Quest reward claim (demo): award an item when enemies_defeated >= 5
+@app.post("/api/quest/claim")
+def quest_claim(req: QuestClaimRequest):
+    if not req.wallet or len(req.wallet) < 20:
+        raise HTTPException(status_code=400, detail="Invalid wallet")
+    if req.enemies_defeated < 5:
+        raise HTTPException(status_code=400, detail="Quest not complete")
+    reward_item = {
+        "owner": req.wallet,
+        "name": "Void Relic",
+        "rarity": "uncommon",
+        "stats": {"power": 5, "origin": "demo"},
+        "quest_code": req.quest_code,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+    }
+    item_id = create_document("item", reward_item)
+    # also log quest completion
+    create_document("quest_completion", {
+        "wallet": req.wallet,
+        "quest_code": req.quest_code,
+        "enemies_defeated": req.enemies_defeated,
+        "time": datetime.now(timezone.utc),
+    })
+    return {"ok": True, "item_id": item_id}
 
 
 # WebSocket: simple pub-sub for world events
