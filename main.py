@@ -11,7 +11,7 @@ import requests
 
 from database import db, create_document, get_documents
 
-app = FastAPI(title="VoidSpark.world API", version="0.2.0")
+app = FastAPI(title="VoidSpark.world API", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -295,6 +295,36 @@ def quest_claim(req: QuestClaimRequest):
         "time": datetime.now(timezone.utc),
     })
     return {"ok": True, "item_id": item_id}
+
+
+# -----------------------------
+# On-chain (Anchor) config surface
+# -----------------------------
+@app.get("/api/onchain/config")
+def onchain_config():
+    cluster = os.getenv("ANCHOR_CLUSTER", "devnet")
+    program_id = os.getenv("ANCHOR_PROGRAM_ID", "Vo1dSp4rk111111111111111111111111111111111")
+    marketplace_treasury = os.getenv("MARKETPLACE_TREASURY", "Vo1dTreasury111111111111111111111111111111")
+    mint_authority = os.getenv("MINT_AUTHORITY", "Vo1dMintAuth1111111111111111111111111111111")
+
+    idl = {
+        "version": "0.1.0",
+        "name": "voidspark",
+        "instructions": [
+            {"name": "createListing", "accounts": [], "args": [{"name": "price", "type": "u64"}]},
+            {"name": "buyListing", "accounts": [], "args": []},
+            {"name": "mintItemNft", "accounts": [], "args": [{"name": "name", "type": "string"}]},
+        ],
+    }
+
+    return {
+        "cluster": cluster,
+        "rpc": os.getenv("SOLANA_RPC", "https://api.devnet.solana.com"),
+        "programId": program_id,
+        "treasury": marketplace_treasury,
+        "mintAuthority": mint_authority,
+        "idl": idl,
+    }
 
 
 # WebSocket: simple pub-sub for world events
