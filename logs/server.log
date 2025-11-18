@@ -1,13 +1,10 @@
 INFO:     Will watch for changes in these directories: ['/home/workspace']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [155] using StatReload
-INFO:     Started server process [157]
+INFO:     Started reloader process [200] using StatReload
+INFO:     Started server process [202]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     172.20.0.1:51086 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     172.20.0.1:59170 - "HEAD / HTTP/1.1" 405 Method Not Allowed
 WARNING:  Unsupported upgrade request.
 WARNING:  No supported WebSocket library detected. Please use "pip install 'uvicorn[standard]'", or install 'websockets' or 'wsproto' manually.
-INFO:     172.20.0.1:51100 - "GET /ws HTTP/1.1" 404 Not Found
-WARNING:  Unsupported upgrade request.
-WARNING:  No supported WebSocket library detected. Please use "pip install 'uvicorn[standard]'", or install 'websockets' or 'wsproto' manually.
-INFO:     172.20.0.1:40148 - "GET /ws HTTP/1.1" 404 Not Found
+INFO:     172.20.0.1:57962 - "GET /ws HTTP/1.1" 404 Not Found
